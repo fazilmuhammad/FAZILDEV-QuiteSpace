@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "334383329158",
+    "project_id": "quitespace-ec7af",
+    "storage_bucket": "quitespace-ec7af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334383329158:android:2dc5685e6ebb2f59624607",
+        "android_client_info": {
+          "package_name": "com.quitespace.fazildev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL5hL8oFI8VbMp3p167N7NI_d-qK-yWF0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
