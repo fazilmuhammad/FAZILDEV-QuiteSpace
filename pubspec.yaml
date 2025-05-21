@@ -86,6 +86,18 @@ flutter:
     - assets/zodiac/capricorn.png
     - assets/zodiac/aquarius.png
     - assets/zodiac/pisces.png
+    - assets/cover/aries.png
+    - assets/cover/taurus.png
+    - assets/cover/gemini.png
+    - assets/cover/cancer.png
+    - assets/cover/leo.png
+    - assets/cover/virgo.png
+    - assets/cover/libra.png
+    - assets/cover/scorpio.png
+    - assets/cover/sagittarius.png
+    - assets/cover/capricorn.png
+    - assets/cover/aquarius.png
+    - assets/cover/pisces.png
     - assets/images/google.png
     - assets/images/facebook.png
     - assets/images/apple.png
