@@ -45,6 +45,9 @@ dependencies:
   intl: ^0.18.1
   firebase_storage: ^12.4.6
   cached_network_image: ^3.4.1
+  google_sign_in: ^6.3.0
+  flutter_facebook_auth: ^7.1.2
+  sign_in_with_apple: ^7.0.1
 
 
 dev_dependencies:
@@ -83,7 +86,11 @@ flutter:
     - assets/zodiac/capricorn.png
     - assets/zodiac/aquarius.png
     - assets/zodiac/pisces.png
-
+    - assets/images/google.png
+    - assets/images/facebook.png
+    - assets/images/apple.png
+    - assets/zodiac/default_profile.png
+    - assets/cover/sagittarius.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

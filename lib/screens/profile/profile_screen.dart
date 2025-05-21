@@ -52,12 +52,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 200,
+                expandedHeight: 100,
                 flexibleSpace: FlexibleSpaceBar(
-                  background: Image.network(
-                    user['coverImage'] ?? '',
-                    fit: BoxFit.cover,
-                  ),
+                  background: Image.asset(user['coverImage'] ?? '', fit: BoxFit.cover,)
                 ),
               ),
               SliverToBoxAdapter(
@@ -70,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           CircleAvatar(
                             radius: 40,
-                            backgroundImage: NetworkImage(user['profileImage'] ?? ''),
+                            backgroundImage: AssetImage(user['zodiacImage'] ?? ''),
                           ),
                           Spacer(),
                           if (widget.userId != FirebaseService.currentUser?.uid)

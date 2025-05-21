@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:quitespace/screens/home/home_screen.dart';
 import 'package:quitespace/screens/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quitespace/services/firebase_service.dart';
-import 'package:quitespace/screens/login_page.dart';
+import 'package:quitespace/screens/auth/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Zodiac Profile App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
             if (user == null) {
               return LoginPage();
             }
-            return ProfilePage();
+            return HomeScreen();
           }
           return Scaffold(body: Center(child: CircularProgressIndicator()));
         },

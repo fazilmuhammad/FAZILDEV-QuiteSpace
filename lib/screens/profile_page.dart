@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:quitespace/services/firebase_service.dart';
-import 'login_page.dart';
+import 'auth/login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -13,6 +12,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -21,25 +21,50 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUserData() async {
-    User? user = FirebaseService.auth.currentUser;
-    if (user != null) {
-      DocumentSnapshot userDoc = await FirebaseService.firestore
-          .collection('users')
-          .doc(user.uid)
-          .get();
+    try {
+      User? user = FirebaseService.auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseService.firestore
+            .collection('users')
+            .doc(user.uid)
+            .get();
+            
+        if (userDoc.exists) {
+          final data = userDoc.data() as Map<String, dynamic>? ?? {};
+          setState(() {
+            _userData = data;
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _userData = {};
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
       setState(() {
-        _userData = userDoc.data() as Map<String, dynamic>?;
         _isLoading = false;
+        _hasError = true;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load profile data: ${e.toString()}')),
+      );
     }
   }
 
   Future<void> _logout() async {
-    await FirebaseService.auth.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+    try {
+      await FirebaseService.auth.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to logout: ${e.toString()}')),
+      );
+    }
   }
 
   @override
@@ -56,28 +81,74 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage(_userData!['zodiacImage'] ?? 'assets/default_profile.png'),
-                    ),
+          : _hasError
+              ? Center(child: Text('Error loading profile data'))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: _getProfileImage(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      _buildProfileItem('Username', _userData?['username']),
+                      SizedBox(height: 10),
+                      _buildProfileItem('Email', _userData?['email'] ?? FirebaseService.auth.currentUser?.email),
+                      SizedBox(height: 10),
+                      _buildProfileItem('Birth Date', _userData?['birthDate']),
+                      SizedBox(height: 10),
+                      _buildProfileItem('Zodiac Sign', _userData?['zodiacSign']),
+                      SizedBox(height: 20),
+                      if (_userData?.isEmpty ?? true)
+                        Center(
+                          child: Text(
+                            'Profile information not found',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  Text('Username: ${_userData!['username']}', style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 10),
-                  Text('Email: ${_userData!['email']}', style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 10),
-                  Text('Birth Date: ${_userData!['birthDate']}', style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 10),
-                  Text('Zodiac Sign: ${_userData!['zodiacSign']}', style: TextStyle(fontSize: 18)),
-                ],
-              ),
-            ),
+                ),
+    );
+  }
+
+  ImageProvider _getProfileImage() {
+    // Check for zodiacImage first
+    if (_userData?['zodiacImage'] != null) {
+      return AssetImage(_userData!['zodiacImage']);
+    }
+    // Then check for coverImage if needed
+    if (_userData?['coverImage'] != null) {
+      return AssetImage(_userData!['coverImage']);
+    }
+    // Default image
+    return AssetImage('assets/zodiac/default_profile.png');
+  }
+
+  Widget _buildProfileItem(String label, String? value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          value ?? 'Not specified',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

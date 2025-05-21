@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:quitespace/screens/login_page.dart';
+import 'package:quitespace/screens/auth/login_page.dart';
 import 'package:quitespace/screens/home_page.dart';
 
 class AuthWrapper extends StatelessWidget {
