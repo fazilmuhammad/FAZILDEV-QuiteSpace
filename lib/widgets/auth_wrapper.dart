@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quitespace/screens/auth/login_page.dart';
-import 'package:quitespace/screens/home_page.dart';
+import 'package:quitespace/screens/home/home_screen.dart';
+
 
 class AuthWrapper extends StatelessWidget {
   @override
@@ -10,7 +11,7 @@ class AuthWrapper extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return HomePage(); // Your main app page after login
+          return HomeScreen(); // Your main app page after login
         } else {
           return LoginPage();
         }

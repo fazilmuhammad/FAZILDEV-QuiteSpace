@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quitespace/services/firebase_service.dart';
-import 'auth/login_page.dart';
+import '../auth/login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   @override

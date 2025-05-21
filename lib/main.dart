@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quitespace/screens/home/home_screen.dart';
-import 'package:quitespace/screens/profile_page.dart';
+import 'package:quitespace/screens/profile/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quitespace/services/firebase_service.dart';
 import 'package:quitespace/screens/auth/login_page.dart';
