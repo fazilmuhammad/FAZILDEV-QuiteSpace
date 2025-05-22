@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quitespace/screens/auth/login_page.dart';
 import 'package:quitespace/screens/post/post_detail_screen.dart';
 import 'package:quitespace/services/firebase_service.dart';
+import 'package:quitespace/utilities/toast_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
@@ -16,6 +17,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late Future<DocumentSnapshot> _userFuture;
   bool _isFollowing = false;
+  TextEditingController _bioController = TextEditingController();
 
   @override
   void initState() {
@@ -47,11 +49,120 @@ class _ProfileScreenState extends State<ProfileScreen> {
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
       );
+      ToastUtils.showSuccessToast('Stay pawsitive, see you soon! 🐱');
+    } catch (e) {
+      ToastUtils.showErrorToast('Failed to logout: ${e.toString()}');
+    }
+  }
+
+  Future<void> _updateBio(String newBio) async {
+    try {
+      final userId = widget.userId ?? FirebaseService.currentUser?.uid;
+      if (userId == null) return;
+
+      await FirebaseService.firestore.collection('users').doc(userId).update({
+        'bio': newBio,
+      });
+
+      setState(() {
+        _userFuture =
+            FirebaseService.firestore.collection('users').doc(userId).get();
+      });
+      // Show success messag
+      ToastUtils.showSuccessToast('Bio updated successfully!');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to logout: ${e.toString()}')),
+        SnackBar(content: Text('Failed to update bio: ${e.toString()}')),
       );
     }
+  }
+
+  void _showBioEditModal(BuildContext context, String currentBio) {
+    _bioController.text = currentBio;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Drag handle
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+
+                // Title
+                const Text(
+                  'Edit Bio',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'instrument sans',
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Text field
+                TextField(
+                  controller: _bioController,
+                  maxLines: 4,
+                  maxLength: 50,
+                  decoration: InputDecoration(
+                    hintText: 'Tell something about yourself...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Save button
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.greenAccent.shade200,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _updateBio(_bioController.text);
+                    },
+                    child: const Text(
+                      'Save Bio',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'jumper',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -74,13 +185,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             slivers: [
               SliverAppBar(
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.white, // Light blue background
+                backgroundColor: Colors.white,
                 expandedHeight: 170,
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
                   background: Stack(
                     children: [
-                      // Optional cover image
                       if (user['coverImage'] != null &&
                           user['coverImage'] != '')
                         Image.asset(
@@ -125,16 +235,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: TextStyle(
                             color: Colors.black,
                             fontFamily: 'instrument sans',
-                            fontSize: 28.0
+                            fontSize: 28.0,
                           ),
                         ),
                         SizedBox(height: 4),
                         Text(
                           '@${user['username'] ?? 'userhandle'}',
-                          style: TextStyle(color: Colors.grey,fontFamily: 'instrument sans',fontSize: 20),
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontFamily: 'instrument sans',
+                            fontSize: 20,
+                          ),
                         ),
                         SizedBox(height: 8),
-                        Text(user['bio'], textAlign: TextAlign.center,style: TextStyle(fontFamily: 'instrument sans',),),
+                        Text(
+                          user['bio'],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontFamily: 'instrument sans'),
+                        ),
                         SizedBox(height: 20),
 
                         SizedBox(
@@ -145,13 +263,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               elevation: 0,
                               backgroundColor: Colors.greenAccent.shade200,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  12.0,
-                                ), // Adjust the value as needed
+                                borderRadius: BorderRadius.circular(12.0),
                               ),
                             ),
                             onPressed: () {
-                              _showBottomModal(context);
+                              _showBottomModal(context, user['bio'] ?? '');
                             },
                             child: Padding(
                               padding: EdgeInsets.all(5.0),
@@ -166,7 +282,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   SizedBox(width: 8),
                                   Text(
                                     'Snuggle Settings',
-                                    style: TextStyle(color: Colors.black,fontFamily: 'jumper',fontSize: 15),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'jumper',
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -179,13 +299,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             _buildStat(
                               'Following',
-                              user['followingCount'] ?? 120,
+                              user['followingCount'] ?? 0,
                             ),
-                            _buildStat(
-                              'Followers',
-                              user['followerCount'] ?? 20,
-                            ),
-                            _buildStat('Twinkles', user['postCount'] ?? 2),
+                            _buildStat('Followers', user['followerCount'] ?? 0),
+                            _buildStat('Twinkles', user['postCount'] ?? 0),
                           ],
                         ),
                         SizedBox(height: 16),
@@ -194,102 +311,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-              // Your posts list comes here
             ],
           );
-          // return CustomScrollView(
-          //   slivers: [
-          //     SliverAppBar(
-          //       expandedHeight: 60,
-          //       flexibleSpace: FlexibleSpaceBar(
-          //         background: Image.asset(
-          //           user['coverImage'] ?? '',
-          //           fit: BoxFit.cover,
-          //         ),
-          //       ),
-          //     ),
-          //     SliverToBoxAdapter(
-          //       child: Padding(
-          //         padding: EdgeInsets.all(16),
-          //         child: Column(
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             Row(
-          //               children: [
-          //                 CircleAvatar(
-          //                   radius: 40,
-          //                   backgroundImage: AssetImage(
-          //                     user['zodiacImage'] ?? '',
-          //                   ),
-          //                 ),
-          //                 Spacer(),
-          //                 if (widget.userId != FirebaseService.currentUser?.uid)
-          //                   ElevatedButton(
-          //                     onPressed: () async {
-          //                       await FirebaseService.toggleFollow(userId);
-          //                       await _checkFollowingStatus();
-          //                     },
-          //                     child: Text(
-          //                       _isFollowing ? 'Following' : 'Follow',
-          //                     ),
-          //                   ),
-          //               ],
-          //             ),
-          //             SizedBox(height: 16),
-          //             Text(
-          //               user['username'],
-          //               style: Theme.of(context).textTheme.headlineSmall,
-          //             ),
-          //             if (user['bio'] != null) ...[
-          //               SizedBox(height: 8),
-          //               Text(user['bio']),
-          //             ],
-          //             SizedBox(height: 16),
-          //             Row(
-          //               mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //               children: [
-          //                 Column(
-          //                   children: [
-          //                     Text(user['postCount']?.toString() ?? '0'),
-          //                     Text('Posts'),
-          //                   ],
-          //                 ),
-          //                 Column(
-          //                   children: [
-          //                     Text(user['followerCount']?.toString() ?? '0'),
-          //                     Text('Followers'),
-          //                   ],
-          //                 ),
-          //                 Column(
-          //                   children: [
-          //                     Text(user['followingCount']?.toString() ?? '0'),
-          //                     Text('Following'),
-          //                   ],
-          //                 ),
-          //               ],
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // );
         },
       ),
     );
   }
 
-  void _showBottomModal(BuildContext context) {
+  void _showBottomModal(BuildContext context, String currentBio) {
     showModalBottomSheet(
       backgroundColor: Colors.white,
-
       context: context,
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Important for bottom sheet
+            mainAxisSize: MainAxisSize.min,
             children: [
+              // Drag handle
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               // Change Bio Button
               SizedBox(
                 height: 70,
@@ -303,15 +351,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     elevation: 0,
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Close modal
-                    // Add your change bio logic here
+                    Navigator.pop(context);
+                    _showBioEditModal(context, currentBio);
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.edit, size: 25, color: Colors.black),
                       SizedBox(width: 8),
-                      Text('Change Bio', style: TextStyle(color: Colors.black,fontFamily: 'jumper',fontSize: 15)),
+                      Text(
+                        'Change Bio',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'jumper',
+                          fontSize: 15,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -329,14 +384,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     elevation: 0,
                   ),
                   onPressed: () {
-                    _logout(); // Call the logout function
+                    Navigator.pop(context);
+                    _logout();
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.logout, size: 25, color: Colors.black),
                       SizedBox(width: 8),
-                      Text('Logout', style: TextStyle(color: Colors.black,fontFamily: 'jumper',fontSize: 15)),
+                      Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'jumper',
+                          fontSize: 15,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -347,17 +410,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
-}
 
-Widget _buildStat(String label, int value) {
-  return Column(
-    children: [
-      Text('$value', style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'instrument sans bold',
-                            fontSize: 16.0
-                          ),),
-      Text(label, style: TextStyle(color: Colors.pinkAccent, fontFamily: 'instrument sans',)),
-    ],
-  );
+  Widget _buildStat(String label, int value) {
+    return Column(
+      children: [
+        Text(
+          '$value',
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'instrument sans bold',
+            fontSize: 16.0,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.pinkAccent,
+            fontFamily: 'instrument sans',
+          ),
+        ),
+      ],
+    );
+  }
 }
