@@ -1,9 +1,7 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quitespace/services/firebase_service.dart';
-import 'package:quitespace/widgets/custom_app_bar.dart';
 import 'package:quitespace/utilities/toast_utils.dart';
 
 class CreatePostScreen extends StatefulWidget {
@@ -14,21 +12,19 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController _contentController = TextEditingController();
   bool _isLoading = false;
-  String _privacy = 'public'; // 'public', 'friends', 'private'
   int _characterCount = 0;
   final int _maxCharacters = 280;
 
   String generateRandomCode({int length = 5}) {
-  const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const digits = '0123456789';
-  final allChars = letters + digits;
-  final rand = Random();
+    const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const digits = '0123456789';
+    final allChars = letters + digits;
+    final rand = Random();
 
-  return List.generate(length, (index) {
-    return allChars[rand.nextInt(allChars.length)];
-  }).join();
-}
-
+    return List.generate(length, (index) {
+      return allChars[rand.nextInt(allChars.length)];
+    }).join();
+  }
 
   Future<void> _createPost() async {
     if (_contentController.text.isEmpty) {
@@ -44,18 +40,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Create post document
       await FirebaseService.firestore.collection('posts').add({
         'postId': generateRandomCode(),
         'userId': FirebaseService.currentUser!.uid,
         'content': _contentController.text,
-        'likeCount': 0,
         'createdAt': FieldValue.serverTimestamp(),
-        'privacy': _privacy,
-        'type': 'text', // To differentiate between future post types
       });
 
-      // Update user's post count
       await FirebaseService.firestore
           .collection('users')
           .doc(FirebaseService.currentUser!.uid)
@@ -75,117 +66,100 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Create Post',
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : _createPost,
-            child: Text(
-              'Post',
-              style: TextStyle(
-                color: _characterCount > _maxCharacters
-                    ? Colors.grey
-                    : Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+      backgroundColor: Color(0xFFF9DCDC),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Spark a Twinkle!',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  color: Color(0xFF2F2B3A),
+                ),
               ),
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Author Info
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(
-                    FirebaseService.currentUser?.photoURL ?? '',
+              SizedBox(height: 16),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _contentController,
+                        decoration: InputDecoration(
+                          hintText: "What's on your cozy mind?",
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.grey),
+                        ),
+                        maxLines: null,
+                        maxLength: _maxCharacters,
+                        onChanged: (text) {
+                          setState(() {
+                            _characterCount = text.length;
+                          });
+                        },
+                        keyboardType: TextInputType.multiline,
+                      ),
+                      Spacer(),
+                      ElevatedButton.icon(
+                        onPressed: _isLoading ? null : _createPost,
+                        icon: Icon(Icons.auto_awesome, color: Colors.black, size: 18),
+                        label: Text(
+                          'Star Drop',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFB3F3C2),
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(width: 10),
-                Text(
-                  FirebaseService.currentUser?.displayName ?? 'Anonymous',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Spacer(),
-                DropdownButton<String>(
-                  value: _privacy,
-                  items: [
-                    DropdownMenuItem(
-                      value: 'public',
-                      child: Row(
-                        children: [
-                          Icon(Icons.public, size: 16),
-                          SizedBox(width: 4),
-                          Text('Public'),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'friends',
-                      child: Row(
-                        children: [
-                          Icon(Icons.people, size: 16),
-                          SizedBox(width: 4),
-                          Text('Friends Only'),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'private',
-                      child: Row(
-                        children: [
-                          Icon(Icons.lock, size: 16),
-                          SizedBox(width: 4),
-                          Text('Private'),
-                        ],
-                      ),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _privacy = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-
-            // Content Input
-            TextField(
-              controller: _contentController,
-              decoration: InputDecoration(
-                hintText: "What's happening?",
-                border: InputBorder.none,
               ),
-              maxLines: null,
-              maxLength: _maxCharacters,
-              onChanged: (text) {
-                setState(() {
-                  _characterCount = text.length;
-                });
-              },
-              keyboardType: TextInputType.multiline,
-            ),
-            SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                '$_characterCount/$_maxCharacters',
-                style: TextStyle(
-                  color: _characterCount > _maxCharacters
-                      ? Colors.red
-                      : Colors.grey,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.public),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundColor: Color(0xFF91E5F6),
+              child: Icon(Icons.add, color: Colors.black),
+            ),
+            label: '',
+          ),
+        ],
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

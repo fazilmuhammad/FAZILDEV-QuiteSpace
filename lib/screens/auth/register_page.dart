@@ -7,7 +7,6 @@ import 'package:quitespace/screens/home/home_screen.dart';
 import 'package:quitespace/services/firebase_service.dart';
 import 'package:quitespace/utilities/zodiac_utils.dart';
 
-
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -24,10 +23,49 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  // Function to generate userUniq
+  String _generateUserUniq(String username) {
+    final random = DateTime.now().millisecondsSinceEpoch % 10000; // Get last 4 digits of timestamp
+    return '${username.toLowerCase()}_$random';
+  }
+
   Future<void> _register() async {
     if (_formKey.currentState!.validate() && _birthDate != null) {
       setState(() => _isLoading = true);
       try {
+        // First check if username is available
+        final username = _usernameController.text.trim();
+        final usernameQuery = await FirebaseService.firestore
+            .collection('users')
+            .where('username', isEqualTo: username)
+            .get();
+
+        if (usernameQuery.docs.isNotEmpty) {
+          _showErrorToast('Username already taken');
+          return;
+        }
+
+        // Generate a unique userUniq
+        String userUniq;
+        bool isUnique;
+        int attempts = 0;
+        
+        do {
+          userUniq = _generateUserUniq(username);
+          final userUniqQuery = await FirebaseService.firestore
+              .collection('users')
+              .where('userUniq', isEqualTo: userUniq)
+              .get();
+          
+          isUnique = userUniqQuery.docs.isEmpty;
+          attempts++;
+          
+          if (attempts > 3) {
+            _showErrorToast('Could not generate unique identifier. Please try again.');
+            return;
+          }
+        } while (!isUnique);
+
         // Create user with email and password
         UserCredential userCredential = await FirebaseService.auth
             .createUserWithEmailAndPassword(
@@ -47,10 +85,10 @@ class _RegisterPageState extends State<RegisterPage> {
             .set({
           'uid': userCredential.user!.uid,
           'email': _emailController.text.trim(),
-          'username': _usernameController.text.trim(),
+          'username': username,
+          'userUniq': userUniq,
           'birthDate': DateFormat('yyyy-MM-dd').format(_birthDate!),
           'zodiacSign': zodiacSign,
-          'zodiacImage': zodiacImage,
           'profileImage': zodiacImage,
           'coverImage': coverImage,
           'bio': '',

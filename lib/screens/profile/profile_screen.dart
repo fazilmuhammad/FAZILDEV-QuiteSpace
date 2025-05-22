@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quitespace/screens/auth/login_page.dart';
-import 'package:quitespace/screens/post/post_detail_screen.dart';
 import 'package:quitespace/services/firebase_service.dart';
 import 'package:quitespace/utilities/toast_utils.dart';
 
@@ -209,7 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: CircleAvatar(
                               radius: 40,
                               backgroundImage: AssetImage(
-                                user['zodiacImage'] ?? '',
+                                user['profileImage'] ?? '',
                               ),
                             ),
                           ),
@@ -240,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          '@${user['username'] ?? 'userhandle'}',
+                          '@${user['userUniq'] ?? 'userhandle'}',
                           style: TextStyle(
                             color: Colors.grey,
                             fontFamily: 'instrument sans',

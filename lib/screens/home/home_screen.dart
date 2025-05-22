@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quitespace/screens/home/discover_screen.dart';
 import 'package:quitespace/screens/home/feed_screen.dart';
-import 'package:quitespace/screens/notifications/notification_screen.dart';
 import 'package:quitespace/screens/post/create_post_screen.dart';
 import 'package:quitespace/screens/profile/profile_screen.dart';
 import 'package:quitespace/services/firebase_service.dart';
