@@ -13,7 +13,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController _contentController = TextEditingController();
   bool _isLoading = false;
   int _characterCount = 0;
-  final int _maxCharacters = 280;
+  final int _maxCharacters = 80;
 
   String generateRandomCode({int length = 5}) {
     const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -76,6 +76,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               Text(
                 'Spark a Twinkle!',
                 style: TextStyle(
+                  fontFamily: 'jumper',
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
                   color: Color(0xFF2F2B3A),
@@ -109,11 +110,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       ),
                       Spacer(),
                       ElevatedButton.icon(
+                      
                         onPressed: _isLoading ? null : _createPost,
                         icon: Icon(Icons.auto_awesome, color: Colors.black, size: 18),
                         label: Text(
                           'Star Drop',
                           style: TextStyle(
+                            fontFamily: 'jumper',
+                            fontSize: 16,
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
@@ -133,33 +137,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.public),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: CircleAvatar(
-              backgroundColor: Color(0xFF91E5F6),
-              child: Icon(Icons.add, color: Colors.black),
-            ),
-            label: '',
-          ),
-        ],
-        type: BottomNavigationBarType.fixed,
       ),
     );
   }

@@ -50,31 +50,63 @@ class _HomeScreenState extends State<HomeScreen> {
               index: _currentIndex,
               children: _screens,
             ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+
+       bottomNavigationBar:      BottomNavigationBar(
+               currentIndex: _currentIndex,
         onTap: (index) {
-          if (index == 2) {
-            _navigateToCreatePost(context);
-          } else {
             setState(() => _currentIndex = index);
-          }
+          
         },
-        type: BottomNavigationBarType.fixed,
-        items: [
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        items:  [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: CircleAvatar(
+              backgroundColor: _currentIndex == 0 ? Color(0xFFA7EFC1) : Colors.white,
+              child: Icon(Icons.home_outlined, color: Colors.black),
+            ),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: CircleAvatar(
+              backgroundColor: _currentIndex == 1 ? Color(0xFFF6D6D6) : Colors.white,
+              child: Icon(Icons.person_outline, color: Colors.black),
+            ),
+            label: '',
           ),
-                 BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Create',
+          BottomNavigationBarItem(
+            icon:  CircleAvatar(
+              backgroundColor: _currentIndex == 2 ? Color(0xFF91E5F6) : Colors.white,
+              child: Icon(Icons.add, color: Colors.black),
+            ),
+            label: '',
           ),
         ],
+        type: BottomNavigationBarType.fixed,
       ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: _currentIndex,
+      //   onTap: (index) {
+      //       setState(() => _currentIndex = index);
+          
+      //   },
+      //   type: BottomNavigationBarType.fixed,
+      //   items: [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.person),
+      //       label: 'Profile',
+      //     ),
+      //            BottomNavigationBarItem(
+      //       icon: Icon(Icons.add),
+      //       label: 'Create',
+      //     ),
+      //   ],
+      // ),
     );
   }
 }

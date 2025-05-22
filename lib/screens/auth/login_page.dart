@@ -7,7 +7,6 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:quitespace/services/firebase_service.dart';
 import 'package:quitespace/screens/home/home_screen.dart';
-import 'package:quitespace/screens/auth/forgot_password_page.dart';
 import 'package:quitespace/screens/auth/register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -222,21 +221,6 @@ class _LoginPageState extends State<LoginPage> {
                     }
                     return null;
                   },
-                ),
-                SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ForgotPasswordPage(),
-                        ),
-                      );
-                    },
-                    child: Text('Forgot Password?'),
-                  ),
                 ),
                 SizedBox(height: 24),
                 ElevatedButton(
