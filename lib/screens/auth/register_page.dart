@@ -38,6 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // Get zodiac sign
         final zodiacSign = ZodiacUtils.getZodiacSign(_birthDate!);
         final zodiacImage = ZodiacUtils.getZodiacImage(zodiacSign);
+        final coverImage = ZodiacUtils.getCoverImage(zodiacSign);
 
         // Store additional user info in Firestore
         await FirebaseService.firestore
@@ -50,8 +51,8 @@ class _RegisterPageState extends State<RegisterPage> {
           'birthDate': DateFormat('yyyy-MM-dd').format(_birthDate!),
           'zodiacSign': zodiacSign,
           'zodiacImage': zodiacImage,
-          'profileImage': '',
-          'coverImage': '',
+          'profileImage': zodiacImage,
+          'coverImage': coverImage,
           'bio': '',
           'followerCount': 0,
           'followingCount': 0,

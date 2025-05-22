@@ -35,4 +35,23 @@ class ZodiacUtils {
     };
     return zodiacImages[zodiacSign] ?? 'assets/zodiac/default.png';
   }
+
+  static String getCoverImage(String zodiacSign) {
+    // You can replace these with actual image URLs or asset paths
+    Map<String, String> zodiacImages = {
+      'Aries': 'assets/cover/aries.png',
+      'Taurus': 'assets/cover/taurus.png',
+      'Gemini': 'assets/cover/gemini.png',
+      'Cancer': 'assets/cover/cancer.png',
+      'Leo': 'assets/cover/leo.png',
+      'Virgo': 'assets/cover/virgo.png',
+      'Libra': 'assets/cover/libra.png',
+      'Scorpio': 'assets/cover/scorpio.png',
+      'Sagittarius': 'assets/cover/sagittarius.png',
+      'Capricorn': 'assets/cover/capricorn.png',
+      'Aquarius': 'assets/cover/aquarius.png',
+      'Pisces': 'assets/cover/pisces.png',
+    };
+    return zodiacImages[zodiacSign] ?? 'assets/cover/default.png';
+  }
 }

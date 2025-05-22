@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quitespace/services/firebase_service.dart';
@@ -16,6 +18,18 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   int _characterCount = 0;
   final int _maxCharacters = 280;
 
+  String generateRandomCode({int length = 5}) {
+  const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const digits = '0123456789';
+  final allChars = letters + digits;
+  final rand = Random();
+
+  return List.generate(length, (index) {
+    return allChars[rand.nextInt(allChars.length)];
+  }).join();
+}
+
+
   Future<void> _createPost() async {
     if (_contentController.text.isEmpty) {
       ToastUtils.showErrorToast('Please enter some text');
@@ -32,13 +46,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     try {
       // Create post document
       await FirebaseService.firestore.collection('posts').add({
+        'postId': generateRandomCode(),
         'userId': FirebaseService.currentUser!.uid,
         'content': _contentController.text,
-        'privacy': _privacy,
         'likeCount': 0,
-        'commentCount': 0,
         'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
+        'privacy': _privacy,
         'type': 'text', // To differentiate between future post types
       });
 

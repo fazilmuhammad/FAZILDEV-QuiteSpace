@@ -55,12 +55,8 @@ class FirebaseService {
     final docRef = await firestore.collection('posts').add({
       'userId': currentUser!.uid,
       'content': content,
-      'imageUrl': imageUrl,
       'privacy': privacy,
       'likeCount': 0,
-      'commentCount': 0,
-      'shareCount': 0,
-      'viewCount': 0,
       'createdAt': FieldValue.serverTimestamp(),
     });
 

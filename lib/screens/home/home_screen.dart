@@ -18,10 +18,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     FeedScreen(),
-    DiscoverScreen(),
-    CreatePostScreen(), // Placeholder for CreatePostScreen
-    NotificationsScreen(),
     ProfileScreen(userId: FirebaseService.currentUser?.uid),
+    CreatePostScreen(),
+    // DiscoverScreen(),
+     // Placeholder for CreatePostScreen
+    // NotificationsScreen(),
+    
   ];
 
   Future<void> _navigateToCreatePost(BuildContext context) async {
@@ -66,20 +68,12 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Discover',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Create',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
+          ),
+                 BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Create',
           ),
         ],
       ),

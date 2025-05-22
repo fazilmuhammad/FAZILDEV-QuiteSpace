@@ -4,24 +4,18 @@ class PostModel {
   final String postId;
   final String userId;
   final String content;
-  final String? imageUrl;
   final String privacy; // 'public', 'friends', 'private'
+  final String type;
   final int likeCount;
-  final int commentCount;
-  final int shareCount;
-  final int viewCount;
   final DateTime createdAt;
 
   PostModel({
     required this.postId,
     required this.userId,
     required this.content,
-    this.imageUrl,
     this.privacy = 'public',
+    this.type = 'text',
     this.likeCount = 0,
-    this.commentCount = 0,
-    this.shareCount = 0,
-    this.viewCount = 0,
     required this.createdAt,
   });
 
@@ -31,12 +25,9 @@ class PostModel {
       postId: doc.id,
       userId: data['userId'],
       content: data['content'],
-      imageUrl: data['imageUrl'],
       privacy: data['privacy'] ?? 'public',
+      type: data['type'] ?? 'text',
       likeCount: data['likeCount'] ?? 0,
-      commentCount: data['commentCount'] ?? 0,
-      shareCount: data['shareCount'] ?? 0,
-      viewCount: data['viewCount'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
@@ -45,12 +36,9 @@ class PostModel {
     return {
       'userId': userId,
       'content': content,
-      'imageUrl': imageUrl,
       'privacy': privacy,
+      'type':type,
       'likeCount': likeCount,
-      'commentCount': commentCount,
-      'shareCount': shareCount,
-      'viewCount': viewCount,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }
